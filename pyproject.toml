@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "micrographonia"
+version = "0.1.0"
+description = "Composable small models for structured reasoning."
+authors = [
+  { name = "Micrographonia Team" }
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []

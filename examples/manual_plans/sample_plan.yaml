@@ -1,0 +1,9 @@
+version: "0.1"
+graph:
+  - id: extract
+    tool: "extractor_A.v1"
+    inputs:
+      text: "${context.text}"
+    out:
+      triples: "$.triples"
+      mentions: "$.mentions"
