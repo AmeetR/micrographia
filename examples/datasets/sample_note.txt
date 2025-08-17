@@ -1,0 +1,3 @@
+Met with Divya to discuss AI orchestration.
+She suggested trying small Gemma models.
+Follow up: Build a demo repo next week.
