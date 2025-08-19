@@ -1,0 +1,32 @@
+{
+  "name": "entity_linker",
+  "version": "v1",
+  "kind": "inproc",
+  "input_schema": {
+    "type": "object",
+    "required": ["mentions"],
+    "properties": {
+      "mentions": {"type": "array", "items": {"type": "string"}}
+    },
+    "additionalProperties": false
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["entities"],
+    "properties": {
+      "entities": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["mention", "entity"],
+          "properties": {
+            "mention": {"type": "string"},
+            "entity": {"type": "string"}
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "additionalProperties": false
+  }
+}

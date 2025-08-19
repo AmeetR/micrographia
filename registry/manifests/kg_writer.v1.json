@@ -1,0 +1,28 @@
+{
+  "name": "kg_writer",
+  "version": "v1",
+  "kind": "inproc",
+  "input_schema": {
+    "type": "object",
+    "required": ["triples", "path"],
+    "properties": {
+      "triples": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 3,
+          "maxItems": 3
+        }
+      },
+      "path": {"type": "string"}
+    },
+    "additionalProperties": false
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["path"],
+    "properties": {"path": {"type": "string"}},
+    "additionalProperties": false
+  }
+}

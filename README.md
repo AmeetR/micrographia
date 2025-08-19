@@ -186,6 +186,13 @@ python examples/run_hello.py
 Spin up FastAPI stubs for extract/link/verify/write. Run a Plan IR YAML.
 Output: JSON KG with provenance.
 
+```bash
+python -m micrographonia.sdk.cli plan.run \
+  --plan examples/manual_plans/notes.yml \
+  --context examples/datasets/note.json \
+  --registry registry/manifests
+```
+
 ---
 
 ## Roadmap
