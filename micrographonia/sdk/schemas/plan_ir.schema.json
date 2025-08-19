@@ -11,8 +11,18 @@
       "additionalProperties": false,
       "properties": {
         "max_tool_calls": {"type": "integer", "minimum": 0},
-        "deadline_ms": {"type": "integer", "minimum": 0},
-        "max_parallel": {"type": "integer", "minimum": 1}
+        "deadline_ms": {"type": "integer", "minimum": 0}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_parallel": {"type": "integer", "minimum": 1},
+        "cache_default": {"type": "boolean"},
+        "retry_default": {
+          "$ref": "#/definitions/retry"
+        }
       }
     },
     "graph": {
@@ -32,7 +42,27 @@
           "out": {
             "type": "object",
             "additionalProperties": {"type": "string"}
-          }
+          },
+          "cache": {"type": "boolean"},
+          "timeout_ms": {"type": "integer", "minimum": 0},
+          "retry": {"$ref": "#/definitions/retry"},
+          "concurrency": {"type": "integer", "minimum": 1}
+        }
+      }
+    }
+  }
+  ,
+  "definitions": {
+    "retry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "retries": {"type": "integer", "minimum": 0},
+        "backoff_ms": {"type": "integer", "minimum": 0},
+        "jitter_ms": {"type": "integer", "minimum": 0},
+        "retry_on": {
+          "type": "array",
+          "items": {"type": "string"}
         }
       }
     }

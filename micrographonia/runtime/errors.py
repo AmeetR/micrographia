@@ -21,9 +21,13 @@ class RegistryError(MicrographiaError):
 class SchemaError(MicrographiaError):
     """Input or output payload failed JSON-schema validation."""
 
-    def __init__(self, message: str, errors: Any | None = None):
+    def __init__(
+        self, message: str, errors: Any | None = None, stage: str | None = None
+    ) -> None:
         super().__init__(message)
         self.errors = errors
+        # stage is optional; when provided it typically indicates PRE/POST.
+        self.stage = stage
 
 
 @dataclass
