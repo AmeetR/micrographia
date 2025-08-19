@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from micrographonia.runtime.state import State, interpolate
+from micrographonia.runtime.errors import SchemaError
 
 
 def test_interpolation() -> None:
@@ -14,5 +15,5 @@ def test_interpolation() -> None:
 
 def test_missing_ref() -> None:
     state = State({}, {})
-    with pytest.raises(KeyError):
+    with pytest.raises(SchemaError):
         interpolate("${unknown}", state)

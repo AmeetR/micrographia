@@ -193,6 +193,14 @@ python -m micrographonia.sdk.cli plan.run \
   --registry registry/manifests
 ```
 
+Validate a plan without running it:
+
+```bash
+python -m micrographonia.sdk.cli plan.validate \
+  --plan examples/manual_plans/notes.yml \
+  --registry registry/manifests
+```
+
 ---
 
 ## Roadmap

@@ -8,12 +8,33 @@ import typer
 from .validate import load_plan, validate_plan
 from ..registry.registry import Registry
 from ..runtime.engine import run_plan
+from ..runtime.errors import (
+    BudgetError,
+    MicrographiaError,
+    PlanSchemaError,
+    SchemaError,
+    ToolCallError,
+)
 
 app = typer.Typer()
 plan_app = typer.Typer()
 registry_app = typer.Typer()
 app.add_typer(plan_app, name="plan")
 app.add_typer(registry_app, name="registry")
+
+
+EXIT_CODES = {
+    SchemaError: 12,
+    ToolCallError: 13,
+    BudgetError: 14,
+    PlanSchemaError: 15,
+}
+
+
+def _exit_err(exc: MicrographiaError) -> None:
+    code = EXIT_CODES.get(type(exc), 1)
+    typer.echo(str(exc), err=True)
+    raise typer.Exit(code)
 
 
 def _load_impls():
@@ -32,9 +53,12 @@ def _load_impls():
 
 @plan_app.command("validate")
 def plan_validate(plan: Path, registry: Path) -> None:
-    reg = Registry(registry)
-    p = load_plan(plan)
-    validate_plan(p, reg)
+    try:
+        reg = Registry(registry)
+        p = load_plan(plan)
+        validate_plan(p, reg)
+    except MicrographiaError as exc:
+        _exit_err(exc)
     typer.echo("ok")
 
 
@@ -46,11 +70,15 @@ def plan_run(
     runs: Path = Path("runs"),
     deadline_ms: int | None = None,
 ) -> None:
-    reg = Registry(registry)
-    p = load_plan(plan)
-    validate_plan(p, reg)
-    ctx = json.loads(Path(context).read_text())
-    record = run_plan(p, ctx, reg, impls=_load_impls(), runs_dir=runs)
+    try:
+        reg = Registry(registry)
+        p = load_plan(plan)
+        validate_plan(p, reg)
+        ctx = json.loads(Path(context).read_text())
+        record = run_plan(p, ctx, reg, impls=_load_impls(), runs_dir=runs)
+    except MicrographiaError as exc:
+        _exit_err(exc)
+        return
     typer.echo(json.dumps(record, indent=2))
 
 

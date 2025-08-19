@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Callable, Dict
+from typing import Any, Callable, Dict, List
 
 from ..sdk.plan_ir import Plan
 from ..registry.registry import Registry
 from .artifacts import RunArtifacts
-from .errors import BudgetError, EngineError, SchemaError, ToolCallError
+from .errors import BudgetError, EngineError, SchemaError, ToolCallError, PlanSchemaError
 from .state import State, interpolate, extract_jsonpath
 from .tools import HttpTool, InprocTool, Tool
 
@@ -29,17 +29,61 @@ def run_plan(
 
     metrics: Dict[str, Dict] = {"tool_calls": 0, "per_node": {}}
     start = time.perf_counter()
+    deadline_at = (
+        start + plan.budget.deadline_ms / 1000.0
+        if plan.budget and plan.budget.deadline_ms
+        else None
+    )
+
+    def _check_deadline(current_id: str) -> None:
+        if deadline_at and time.perf_counter() > deadline_at:
+            artifacts.write_node_error(current_id, "deadline exceeded")
+            raise BudgetError("deadline_ms exceeded")
+
     ok = True
     last_id = None
 
-    for node in plan.graph:
+    index: Dict[str, Any] = {n.id: n for n in plan.graph}
+    seen: set[str] = set()
+    ordered: List = []
+    while len(ordered) < len(plan.graph):
+        progress = False
+        for n in plan.graph:
+            if n.id in seen:
+                continue
+            needs = n.needs or []
+            if all(req in seen or req not in index for req in needs):
+                ordered.append(n)
+                seen.add(n.id)
+                progress = True
+        if not progress:
+            raise PlanSchemaError("cycle or unsatisfied 'needs' detected")
+
+    for node in ordered:
         last_id = node.id
+        _check_deadline(node.id)
+
         if plan.budget and plan.budget.max_tool_calls is not None:
             if metrics["tool_calls"] >= plan.budget.max_tool_calls:
                 artifacts.write_node_error(node.id, "budget exceeded")
                 raise BudgetError("max tool calls exceeded")
 
-        inputs = interpolate(node.inputs, state)
+        if node.needs:
+            missing = [n for n in node.needs if n not in state["nodes"]]
+            if missing:
+                artifacts.write_node_error(node.id, f"unsatisfied needs: {missing}")
+                raise PlanSchemaError(
+                    f"unsatisfied needs for node {node.id}: {missing}"
+                )
+
+        try:
+            inputs = interpolate(node.inputs, state)
+        except SchemaError as exc:
+            ok = False
+            artifacts.write_node_error(node.id, str(exc))
+            metrics["per_node"][node.id] = {"ms": 0, "ok": False}
+            break
+
         manifest = registry.resolve(node.tool)
         if manifest.kind == "http":
             tool: Tool = HttpTool(manifest)
@@ -60,6 +104,8 @@ def run_plan(
                 "ok": False,
             }
             break
+
+        _check_deadline(node.id)
 
         node_ms = int((time.perf_counter() - node_start) * 1000)
         artifacts.write_node_response(node.id, node.tool, response, node_ms)

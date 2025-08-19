@@ -3,6 +3,8 @@ from __future__ import annotations
 import re
 from typing import Any, Dict
 
+from .errors import SchemaError
+
 REF_RE = re.compile(r"\$\{([^}]+)\}")
 
 
@@ -26,14 +28,16 @@ def _resolve_expr(expr: str, state: State) -> Any:
         parts = parts[1:]
     else:
         if parts[0] not in state["nodes"]:
-            raise KeyError(expr)
+            available = sorted(state["nodes"].keys())
+            raise SchemaError(f"missing reference {expr}; available: {available}")
         target = state["nodes"][parts[0]]
         parts = parts[1:]
     for part in parts:
-        if isinstance(target, dict):
+        if isinstance(target, dict) and part in target:
             target = target[part]
         else:
-            raise KeyError(expr)
+            available = sorted(target.keys()) if isinstance(target, dict) else []
+            raise SchemaError(f"missing reference {expr}; available: {available}")
     return target
 
 
