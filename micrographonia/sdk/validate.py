@@ -5,9 +5,9 @@ from pathlib import Path
 from typing import Dict, List, Set
 
 import yaml
-from jsonschema import Draft7Validator
+from jsonschema import Draft7Validator, ValidationError
 
-from .plan_ir import Plan, Node, Budget
+from .plan_ir import Plan, Node, Budget, Execution, RetryPolicy
 from ..registry.registry import Registry
 from ..runtime.errors import PlanSchemaError
 
@@ -21,15 +21,53 @@ def load_plan(path: str | Path) -> Plan:
 
     path = Path(path)
     data = json.loads(path.read_text()) if path.suffix == ".json" else yaml.safe_load(path.read_text())
-    VALIDATOR.validate(data)
+    try:
+        VALIDATOR.validate(data)
+    except ValidationError as exc:
+        raise PlanSchemaError(str(exc)) from exc
     return _from_dict(data)
 
 
 def _from_dict(data: Dict) -> Plan:
     budget = data.get("budget")
     budget_obj = Budget(**budget) if budget else None
-    nodes = [Node(**n) for n in data["graph"]]
-    return Plan(version=data["version"], vars=data.get("vars", {}), budget=budget_obj, graph=nodes)
+
+    execution = data.get("execution")
+    if execution:
+        retry_def = execution.get("retry_default")
+        retry_def_obj = RetryPolicy(**retry_def) if retry_def else None
+        execution_obj = Execution(
+            max_parallel=execution.get("max_parallel"),
+            cache_default=execution.get("cache_default"),
+            retry_default=retry_def_obj,
+        )
+    else:
+        execution_obj = None
+
+    def _node_from_dict(n: Dict) -> Node:
+        retry = n.get("retry")
+        retry_obj = RetryPolicy(**retry) if retry else None
+        return Node(
+            id=n["id"],
+            tool=n["tool"],
+            inputs=n["inputs"],
+            needs=n.get("needs"),
+            out=n.get("out"),
+            cache=n.get("cache"),
+            timeout_ms=n.get("timeout_ms"),
+            retry=retry_obj,
+            concurrency=n.get("concurrency"),
+        )
+
+    nodes = [_node_from_dict(n) for n in data["graph"]]
+
+    return Plan(
+        version=data["version"],
+        vars=data.get("vars", {}),
+        budget=budget_obj,
+        graph=nodes,
+        execution=execution_obj,
+    )
 
 
 def validate_plan(plan: Plan, registry: Registry) -> None:
