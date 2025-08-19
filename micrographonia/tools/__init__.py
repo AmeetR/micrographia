@@ -3,6 +3,8 @@
 Each tool is intended to be replaced by a small specialized model.
 """
 
+from . import teachers
+
 class BaseTool:
     """Base class for tool stubs."""
 
@@ -12,3 +14,6 @@ class BaseTool:
         """Execute the tool with given arguments."""
         # TODO: implement tool behavior
         return {}
+
+
+__all__ = ["BaseTool", "teachers"]
