@@ -1,0 +1,30 @@
+version: "0.1"
+graph:
+  - id: extract
+    tool: extractor_A.v1
+    inputs:
+      text: "${context.text}"
+    out:
+      mentions: "$.mentions"
+  - id: link
+    tool: entity_linker.v1
+    needs: [extract]
+    inputs:
+      mentions: "${extract.mentions}"
+    out:
+      entities: "$.entities"
+  - id: verify
+    tool: verifier.v1
+    needs: [link]
+    inputs:
+      entities: "${link.entities}"
+    out:
+      triples: "$.triples"
+  - id: write
+    tool: kg_writer.v1
+    needs: [verify]
+    inputs:
+      triples: "${verify.triples}"
+      path: "${context.run_output}/kg.json"
+    out:
+      path: "$.path"

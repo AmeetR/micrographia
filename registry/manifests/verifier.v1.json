@@ -1,0 +1,40 @@
+{
+  "name": "verifier",
+  "version": "v1",
+  "kind": "inproc",
+  "input_schema": {
+    "type": "object",
+    "required": ["entities"],
+    "properties": {
+      "entities": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["mention", "entity"],
+          "properties": {
+            "mention": {"type": "string"},
+            "entity": {"type": "string"}
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "output_schema": {
+    "type": "object",
+    "required": ["triples"],
+    "properties": {
+      "triples": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 3,
+          "maxItems": 3
+        }
+      }
+    },
+    "additionalProperties": false
+  }
+}
