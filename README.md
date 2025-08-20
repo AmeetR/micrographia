@@ -201,6 +201,65 @@ python -m micrographonia.sdk.cli plan.validate \
   --registry registry/manifests
 ```
 
+### Tool Manifest (In‑Proc)
+
+In‑process tools specify how their model should be loaded.  A manifest must
+include an ``entrypoint`` (a dotted Python path) and a ``model`` block:
+
+```json
+{
+  "name": "extractor_A",
+  "version": "v2",
+  "kind": "inproc",
+  "entrypoint": "examples.tools.extractor.factory",
+  "model": {
+    "base_id": "google/gemma-3-270m",
+    "adapter_uri": "hf://org/repo@rev/adapter/",
+    "revision": "rev",            # optional for HF
+    "sha256": "…",                 # optional integrity check
+    "loader": "peft-lora",         # currently supported value
+    "quant": "4bit",               # optional
+    "device_hint": "auto"         # optional
+  }
+}
+```
+
+Supported ``adapter_uri`` schemes: ``hf://`` for Hugging Face, ``s3://`` or
+``gs://`` for object storage and ``file://`` for local paths.  Providing a
+``revision`` or ``sha256`` pins the artifact and guarantees reproducibility.
+
+Tool factories **must** expose ``factory(manifest, loader, preloaded=None)``.
+The pre‑flight step loads the tokenizer and model once and passes them via the
+``preloaded`` tuple; a factory may call ``loader.load`` itself when ``preloaded``
+is ``None``.
+
+Private Hugging Face repos are supported by setting ``HUGGINGFACE_HUB_TOKEN``.
+S3/GS credentials are resolved by ``fsspec`` using the usual environment
+variables. Quantisation flags are best‑effort: if ``bitsandbytes`` is missing
+the loader falls back to full precision with a warning.
+
+### Pre‑flight & ``plan.check-models``
+
+Before executing any node, the runtime resolves and loads all referenced tools.
+Use the CLI to dry‑run this resolution:
+
+```bash
+python -m micrographonia.sdk.cli plan.check-models \
+  --plan examples/manual_plans/notes_inproc.yml \
+  --registry registry/manifests \
+  [--no-warmup]
+```
+
+This command exits non‑zero on any missing or invalid model and mirrors the
+pre‑flight step that happens automatically when running ``plan.run``.
+
+### No central store needed
+
+Micrographia remains stateless: manifests embed URIs and the
+``ModelLoader`` uses ``huggingface_hub`` and ``fsspec`` to fetch adapters,
+storing them in a local content‑addressed cache.  Swapping adapters or changing
+revisions requires only updating the manifest.
+
 ---
 
 ## Roadmap

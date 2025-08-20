@@ -2,6 +2,7 @@
   "name": "extractor_A",
   "version": "v1",
   "kind": "inproc",
+  "entrypoint": "micrographonia.tools.stubs.extractor_A.factory",
   "input_schema": {
     "type": "object",
     "required": ["text"],
@@ -15,5 +16,11 @@
       "mentions": {"type": "array", "items": {"type": "string"}}
     },
     "additionalProperties": false
+  }
+  ,
+  "model": {
+    "base_id": "stub",
+    "adapter_uri": "file://stub",
+    "loader": "peft-lora"
   }
 }

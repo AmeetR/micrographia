@@ -1,0 +1,6 @@
+version: "0.1"
+graph:
+  - id: extract
+    tool: extractor_A.v2
+    inputs:
+      text: "hello"

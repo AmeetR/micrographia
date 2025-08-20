@@ -11,6 +11,7 @@ from jsonschema import Draft7Validator
 
 from .manifest import ToolManifest
 from ..runtime.errors import RegistryError
+from ..runtime.constants import LoaderType, ADAPTER_URI_SCHEMES
 
 
 class Registry:
@@ -35,6 +36,22 @@ class Registry:
             if manifest.kind == "http":
                 if not manifest.endpoint or not manifest.endpoint.startswith("http"):
                     raise RegistryError(f"http tool {key} missing valid endpoint")
+            elif manifest.kind == "inproc":
+                if not manifest.entrypoint:
+                    raise RegistryError(f"inproc tool {key} missing entrypoint")
+                model = manifest.model or {}
+                if not model.get("base_id"):
+                    raise RegistryError("manifest.model.base_id missing")
+                if not model.get("adapter_uri"):
+                    raise RegistryError("manifest.model.adapter_uri missing")
+                loader_val = model.get("loader", LoaderType.PEFT_LORA.value)
+                try:
+                    LoaderType(loader_val)
+                except ValueError:
+                    raise RegistryError(f"Unsupported loader: {loader_val}")
+                uri = model.get("adapter_uri", "")
+                if not any(uri.startswith(p) for p in ADAPTER_URI_SCHEMES):
+                    raise RegistryError("Unsupported scheme for adapter_uri")
             Draft7Validator.check_schema(manifest.input_schema)
             Draft7Validator.check_schema(manifest.output_schema)
             self._manifests[key] = manifest
@@ -70,6 +87,8 @@ class Registry:
                         "input_schema": m.input_schema,
                         "output_schema": m.output_schema,
                         "endpoint": m.endpoint,
+                        "entrypoint": m.entrypoint,
+                        "model": m.model,
                         "tags": m.tags,
                     },
                     sort_keys=True,
