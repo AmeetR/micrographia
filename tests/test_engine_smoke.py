@@ -27,8 +27,9 @@ def test_engine_run(tmp_path: Path) -> None:
     ctx = json.loads(CTX_PATH.read_text())
     record = run_plan(plan, ctx, reg, impls=IMPLS, runs_dir=tmp_path)
     assert record["ok"] is True
-    assert record["metrics"]["tool_calls"] == 4
-    out_path = Path(record["state_tail"]["path"])
+    assert record["totals"]["tool_calls"] == 4
+    node_resp = Path(record["artifacts"]["nodes"]["write"]["response"])
+    out_path = Path(json.loads(node_resp.read_text())["data"]["path"])
     assert out_path.exists()
 
 
@@ -41,5 +42,5 @@ def test_engine_failure(tmp_path: Path) -> None:
     bad_impls["entity_linker.v1"] = lambda p: {}
     record = run_plan(plan, ctx, reg, impls=bad_impls, runs_dir=tmp_path)
     assert record["ok"] is False
-    node_err = record["paths"]["nodes"]["link"]["error"]
+    node_err = record["artifacts"]["nodes"]["link"]["error"]
     assert Path(node_err).exists()
