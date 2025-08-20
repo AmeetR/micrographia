@@ -10,6 +10,7 @@ from ..registry.registry import Registry
 from ..runtime.engine import run_plan
 from ..runtime.errors import (
     BudgetError,
+    EngineError,
     MicrographiaError,
     PlanSchemaError,
     SchemaError,
@@ -28,6 +29,7 @@ EXIT_CODES = {
     ToolCallError: 13,
     BudgetError: 14,
     PlanSchemaError: 15,
+    EngineError: 15,
 }
 
 
@@ -42,10 +44,10 @@ def _load_impls():
         from ..tools.stubs import extractor_A, entity_linker, verifier, kg_writer
 
         return {
-            "extractor_A.v1": extractor_A.run,
-            "entity_linker.v1": entity_linker.run,
-            "verifier.v1": verifier.run,
-            "kg_writer.v1": kg_writer.run,
+            "extractor_A.v1": extractor_A,
+            "entity_linker.v1": entity_linker,
+            "verifier.v1": verifier,
+            "kg_writer.v1": kg_writer,
         }
     except Exception:  # pragma: no cover
         return {}
@@ -68,18 +70,39 @@ def plan_run(
     context: Path,
     registry: Path,
     runs: Path = Path("runs"),
-    deadline_ms: int | None = None,
+    run_id: str | None = typer.Option(None, help="Reuse an existing run id"),
+    resume: bool = typer.Option(True, help="Resume if run dir exists"),
+    max_parallel: int | None = typer.Option(None, help="Override plan max_parallel"),
+    cache_read: bool = typer.Option(True, help="Enable cache reads"),
+    cache_write: bool = typer.Option(True, help="Enable cache writes"),
+    emit_summary: bool = typer.Option(False, help="Emit one-line summary"),
 ) -> None:
     try:
         reg = Registry(registry)
         p = load_plan(plan)
         validate_plan(p, reg)
         ctx = json.loads(Path(context).read_text())
-        record = run_plan(p, ctx, reg, impls=_load_impls(), runs_dir=runs)
+        record, err = run_plan(
+            p,
+            ctx,
+            reg,
+            impls=_load_impls(),
+            runs_dir=runs,
+            run_id=run_id,
+            resume=resume,
+            max_parallel=max_parallel,
+            cache_read=cache_read,
+            cache_write=cache_write,
+        )
     except MicrographiaError as exc:
         _exit_err(exc)
         return
-    typer.echo(json.dumps(record, indent=2))
+    if emit_summary:
+        typer.echo(json.dumps(record))
+    else:
+        typer.echo(json.dumps(record, indent=2))
+    if err:
+        _exit_err(err)
 
 
 @registry_app.command("health")

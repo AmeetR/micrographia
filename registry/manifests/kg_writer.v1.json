@@ -2,6 +2,7 @@
   "name": "kg_writer",
   "version": "v1",
   "kind": "inproc",
+  "tags": ["side_effecting"],
   "input_schema": {
     "type": "object",
     "required": ["triples", "path"],

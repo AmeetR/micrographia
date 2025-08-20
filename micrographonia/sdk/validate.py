@@ -10,6 +10,7 @@ from jsonschema import Draft7Validator, ValidationError
 from .plan_ir import Plan, Node, Budget, Execution, RetryPolicy
 from ..registry.registry import Registry
 from ..runtime.errors import PlanSchemaError
+from ..runtime.retry import RetryMatcher
 
 SCHEMA_PATH = Path(__file__).parent / "schemas" / "plan_ir.schema.json"
 SCHEMA = json.loads(SCHEMA_PATH.read_text())
@@ -82,10 +83,21 @@ def validate_plan(plan: Plan, registry: Registry) -> None:
             registry.resolve(node.tool)
         except Exception as exc:
             raise PlanSchemaError(f"unknown tool {node.tool}") from exc
+        if node.retry and node.retry.retry_on:
+            try:
+                RetryMatcher(node.retry.retry_on)
+            except ValueError as exc:
+                raise PlanSchemaError(str(exc)) from exc
 
     # needs references exist and DAG acyclic
     edges = {node.id: node.needs or [] for node in plan.graph}
     _check_acyclic(edges)
+
+    if plan.execution and plan.execution.retry_default and plan.execution.retry_default.retry_on:
+        try:
+            RetryMatcher(plan.execution.retry_default.retry_on)
+        except ValueError as exc:
+            raise PlanSchemaError(str(exc)) from exc
 
 
 def _check_acyclic(edges: Dict[str, List[str]]) -> None:
