@@ -1,3 +1,5 @@
+"""Filesystem-backed registry for resolving tool manifests."""
+
 from __future__ import annotations
 
 import json

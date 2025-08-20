@@ -1,3 +1,5 @@
+"""Dataclasses describing tools available in the registry."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
