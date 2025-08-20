@@ -1,3 +1,5 @@
+"""Command line interface for validating and executing plans."""
+
 from __future__ import annotations
 
 import json

@@ -1,7 +1,12 @@
+"""Stub knowledge-graph writer that persists triples to disk."""
+
 import json
 from pathlib import Path
 
+
 def run(payload: dict) -> dict:
+    """Write triples to a JSON file and return its path."""
+
     path = Path(payload.get("path", "kg.json"))
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as fh:

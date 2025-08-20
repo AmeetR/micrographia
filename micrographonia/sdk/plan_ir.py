@@ -1,3 +1,5 @@
+"""Dataclasses representing the plan intermediate representation."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

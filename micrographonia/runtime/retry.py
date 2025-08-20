@@ -1,3 +1,5 @@
+"""Utilities for parsing retry policies and computing backoff delays."""
+
 from __future__ import annotations
 
 import random
@@ -9,6 +11,8 @@ from .errors import EngineError, SchemaError, ToolCallError
 
 @dataclass
 class _Rule:
+    """Internal representation of a single retry rule."""
+
     exc_type: type
     code: int | None = None
     family: int | None = None
@@ -28,6 +32,8 @@ class RetryMatcher:
         self.rules: List[_Rule] = [self._parse(p) for p in patterns]
 
     def _parse(self, pattern: str) -> _Rule:
+        """Convert a retry *pattern* string into a :class:`_Rule`."""
+
         cls_name, _, spec = pattern.partition(":")
         exc_type = self._MAP.get(cls_name)
         if exc_type is None:

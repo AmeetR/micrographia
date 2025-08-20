@@ -1,3 +1,5 @@
+"""Convenience imports for stub tool implementations used in tests."""
+
 from .extractor_A import run as extractor_A
 from .entity_linker import run as entity_linker
 from .verifier import run as verifier

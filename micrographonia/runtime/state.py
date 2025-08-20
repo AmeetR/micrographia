@@ -1,3 +1,5 @@
+"""Helpers for managing runtime state and resolving references."""
+
 from __future__ import annotations
 
 import re
@@ -19,6 +21,8 @@ class State(Dict[str, Any]):
 
 
 def _resolve_expr(expr: str, state: State) -> Any:
+    """Resolve a dotted ``expr`` against the current ``state``."""
+
     parts = expr.split(".")
     if parts[0] == "context":
         target = state["context"]

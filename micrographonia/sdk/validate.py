@@ -1,3 +1,5 @@
+"""Helpers for loading plans and validating their structure."""
+
 from __future__ import annotations
 
 import json
@@ -30,6 +32,8 @@ def load_plan(path: str | Path) -> Plan:
 
 
 def _from_dict(data: Dict) -> Plan:
+    """Construct a :class:`Plan` from a plain dictionary."""
+
     budget = data.get("budget")
     budget_obj = Budget(**budget) if budget else None
 
@@ -101,6 +105,8 @@ def validate_plan(plan: Plan, registry: Registry) -> None:
 
 
 def _check_acyclic(edges: Dict[str, List[str]]) -> None:
+    """Ensure that the dependency graph described by ``edges`` is acyclic."""
+
     temp: Set[str] = set()
     perm: Set[str] = set()
 
