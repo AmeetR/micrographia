@@ -1,4 +1,5 @@
-from micrographonia.runtime.cache import cache_key
+import time
+from micrographonia.runtime.cache import cache_key, SimpleCache
 
 
 def test_cache_key_stability() -> None:
@@ -9,3 +10,15 @@ def test_cache_key_stability() -> None:
     assert key1 == key2
     assert key1 != key3
     assert key1 != key4
+
+
+def test_cache_eviction(tmp_path) -> None:
+    cache = SimpleCache(tmp_path, max_bytes=20)
+    cache.write("a", {"v": "a"})
+    time.sleep(0.01)
+    cache.write("b", {"v": "b"})
+    time.sleep(0.01)
+    cache.write("c", {"v": "c"})
+    files = {p.name for p in tmp_path.glob("*.json")}
+    assert "a.json" not in files  # oldest evicted
+    assert "b.json" in files and "c.json" in files

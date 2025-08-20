@@ -3,20 +3,34 @@ from __future__ import annotations
 import datetime as _dt
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Iterable
 from uuid import uuid4
 
 from ..sdk.plan_ir import Plan
 
 
 class RunArtifacts:
-    """Helper for writing run artifacts to disk."""
+    """Helper for reading/writing run artifacts.
 
-    def __init__(self, root: str | Path = "runs") -> None:
+    The helper owns the on-disk directory structure for a run.  When a
+    ``run_id`` is supplied the corresponding directory will be reused
+    (allowing resumption); otherwise a new run identifier is generated.
+    """
+
+    def __init__(self, root: str | Path = "runs", run_id: str | None = None) -> None:
         self.root_base = Path(root)
-        date_dir = _dt.date.today().isoformat()
-        self.run_id = uuid4().hex[:8]
-        self.root = self.root_base / date_dir / self.run_id
+        if run_id is None:
+            run_id = uuid4().hex[:8]
+        # Runs are grouped by date for easier browsing.  When resuming we
+        # search for an existing directory with the supplied run_id.
+        candidates: Iterable[Path] = self.root_base.glob(f"*/{run_id}")
+        try:
+            self.root = next(iter(candidates))
+        except StopIteration:
+            date_dir = _dt.date.today().isoformat()
+            self.root = self.root_base / date_dir / run_id
+        self.run_id = run_id
+
         self.nodes_dir = self.root / "nodes"
         self.output_dir = self.root / "outputs"
         self.root.mkdir(parents=True, exist_ok=True)
@@ -62,3 +76,33 @@ class RunArtifacts:
         path = self.root / "metrics.json"
         self._write(path, metrics)
         self.paths["metrics"] = str(path)
+
+    # ------------------------------------------------------------------
+    def write_timeline(self, timeline: Dict[str, Any]) -> None:
+        path = self.root / "metrics.timeline.json"
+        self._write(path, timeline)
+        self.paths["timeline"] = str(path)
+
+    # ------------------------------------------------------------------
+    def write_run_info(self, info: Dict[str, Any]) -> None:
+        path = self.root / "run.json"
+        self._write(path, info)
+
+    # ------------------------------------------------------------------
+    def read_run_info(self) -> Dict[str, Any] | None:
+        path = self.root / "run.json"
+        if not path.exists():
+            return None
+        return json.loads(path.read_text())
+
+    # ------------------------------------------------------------------
+    def read_node_response(self, node_id: str) -> Dict[str, Any] | None:
+        path = self.nodes_dir / f"{node_id}.response.json"
+        if not path.exists():
+            return None
+        return json.loads(path.read_text())
+
+    # ------------------------------------------------------------------
+    def write_summary(self, summary: Dict[str, Any]) -> None:
+        path = self.root / "summary.json"
+        self._write(path, summary)

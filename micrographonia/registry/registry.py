@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 from typing import Any, Dict
 
@@ -46,6 +47,35 @@ class Registry:
     # ------------------------------------------------------------------
     def summary(self) -> Dict[str, Dict[str, Any]]:
         return {key: {"kind": m.kind} for key, m in self._manifests.items()}
+
+    # ------------------------------------------------------------------
+    def content_hash(self) -> str:
+        """Return a deterministic hash of all loaded manifests.
+
+        Used to guarantee that a resumed run is operating against the same
+        registry contents as the original run.
+        """
+
+        parts = []
+        for key in sorted(self._manifests):
+            m = self._manifests[key]
+            parts.append(
+                json.dumps(
+                    {
+                        "name": m.name,
+                        "version": m.version,
+                        "kind": m.kind,
+                        "input_schema": m.input_schema,
+                        "output_schema": m.output_schema,
+                        "endpoint": m.endpoint,
+                        "tags": m.tags,
+                    },
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+            )
+        blob = "".join(parts)
+        return hashlib.sha256(blob.encode()).hexdigest()
 
     # ------------------------------------------------------------------
     def health(self, base_url: str | None = None) -> Dict[str, bool]:

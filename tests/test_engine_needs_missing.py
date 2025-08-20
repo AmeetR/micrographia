@@ -24,7 +24,8 @@ def test_missing_reference(tmp_path: Path) -> None:
         inputs={"mentions": "${extract.missing}"},
     )
     plan = Plan(version="0.1", graph=[n1, n2])
-    record = run_plan(plan, {}, reg, impls=IMPLS, runs_dir=tmp_path)
+    record, err = run_plan(plan, {}, reg, impls=IMPLS, runs_dir=tmp_path)
     assert record["ok"] is False
-    err_path = Path(record["paths"]["nodes"]["link"]["error"])
+    assert err is not None
+    err_path = Path(record["artifacts"]["nodes"]["link"]["error"])
     assert err_path.exists()
