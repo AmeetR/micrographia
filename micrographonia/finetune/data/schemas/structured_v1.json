@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NotesKGTriples",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "triples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "subject": {"type": "string"},
+          "predicate": {"type": "string"},
+          "object": {"type": "string"}
+        },
+        "required": ["subject", "predicate", "object"]
+      }
+    }
+  },
+  "required": ["triples"]
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FinetuneInteraction",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string"},
+    "source": {"type": "string"},
+    "input": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "prompt": {"type": "string"},
+        "context": {"type": "object"}
+      },
+      "required": ["prompt"]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "text": {"type": ["string", "null"]},
+        "json": {"type": ["object", "null"]}
+      },
+      "anyOf": [
+        {"required": ["text"]},
+        {"required": ["json"]}
+      ]
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "task": {"type": "string"},
+        "lang": {"type": "string"},
+        "difficulty": {"type": "string"},
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "teacher_model": {"type": ["string", "null"]},
+        "added_at": {"type": "string"}
+      },
+      "required": ["task"]
+    }
+  },
+  "required": ["id", "source", "input", "target", "meta"]
+}
