@@ -5,7 +5,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
-from micrographonia.sdk.cli import app
+from micrographonia.sdk.cli import app, ExitCode
 
 REG_DIR = Path("registry/manifests").resolve()
 
@@ -35,7 +35,7 @@ def test_cli_emit_summary(tmp_path: Path) -> None:
         ],
         env=env,
     )
-    assert result.exit_code == 0
+    assert result.exit_code == ExitCode.SUCCESS
     data = json.loads(result.stdout.strip())
     assert data["ok"] is True
     assert data["stop_reason"] is None
@@ -66,6 +66,6 @@ def test_cli_exit_code_deadline(tmp_path: Path) -> None:
         ],
         env=env,
     )
-    assert result.exit_code == 14
+    assert result.exit_code == ExitCode.BUDGET_ERROR
     data = json.loads(result.stdout.strip())
     assert data["stop_reason"] == "deadline"
