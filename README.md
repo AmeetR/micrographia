@@ -125,11 +125,23 @@ micrographonia/
 │  ├─ registry/         # Tool manifests (schemas, endpoints)
 │  ├─ tools/            # Stub services (FastAPI, replace with Gemma fine-tunes)
 │  ├─ sdk/              # CLI & schema definitions
+│  ├─ finetune/         # Small-model training pipeline
 │  └─ docs/             # background, plan IR spec, tutorials
 └─ examples/
    ├─ manual_plans/     # Sample Plan IR YAMLs
    └─ datasets/         # Example inputs (notes, papers, logs)
 ```
+
+### Finetuning utilities
+
+The ``micrographonia.finetune`` package provides a task-agnostic training
+pipeline. At this stage it only exposes a seed-generation command:
+
+```bash
+python -m micrographonia.finetune.cli datagen-seed --task notes_kg --out seeds.jsonl
+```
+
+See ``micrographonia/finetune/README.md`` for more details.
 
 ---
 
