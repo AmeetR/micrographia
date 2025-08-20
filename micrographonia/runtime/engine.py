@@ -27,14 +27,19 @@ from .concurrency import ConcurrencyManager
 from .errors import (
     BudgetError,
     EngineError,
+    ModelLoadError,
     MicrographiaError,
     PlanSchemaError,
+    RegistryError,
     SchemaError,
     ToolCallError,
 )
 from .retry import RetryMatcher, backoff_delays
 from .state import State, extract_jsonpath, interpolate
-from .tools import HttpTool, InprocTool, Tool
+from .tools import Tool, InprocTool
+from .model_loader import ModelLoader
+from .preflight import preflight_build_tool_pool
+from .constants import STOP_REASON_PREFLIGHT
 
 
 # ---------------------------------------------------------------------------
@@ -60,6 +65,8 @@ async def run_plan_async(
     max_parallel: int | None = None,
     cache_read: bool = True,
     cache_write: bool = True,
+    loader: ModelLoader | None = None,
+    warmup: bool = True,
 ) -> Tuple[Dict, MicrographiaError | None]:
     """Execute *plan* asynchronously.
 
@@ -103,6 +110,34 @@ async def run_plan_async(
         "retries": 0,
     }
     timeline: Dict[str, Any] = {}
+
+    start = time.perf_counter()
+    loader = loader or ModelLoader()
+    try:
+        tool_pool = preflight_build_tool_pool(plan, registry, loader=loader, warmup=warmup)
+    except MicrographiaError as exc:
+        metrics["stop_reason"] = STOP_REASON_PREFLIGHT
+        artifacts.write_preflight_error(str(exc), exc.__class__.__name__)
+        total_ms = int((time.perf_counter() - start) * 1000)
+        metrics["total_ms"] = total_ms
+        artifacts.write_metrics(metrics)
+        artifacts.write_timeline(timeline)
+        summary = {
+            "run_id": artifacts.run_id,
+            "ok": False,
+            "stop_reason": metrics["stop_reason"],
+            "totals": {
+                "nodes": len(plan.graph),
+                "tool_calls": 0,
+                "cache_hits": 0,
+                "retries": 0,
+                "total_ms": total_ms,
+            },
+            "artifacts": artifacts.paths,
+        }
+        artifacts.write_summary(summary)
+        return summary, exc
+
     for node in plan.graph:
         data = artifacts.read_node_response(node.id)
         if data:
@@ -114,7 +149,7 @@ async def run_plan_async(
             else:
                 expose = response
             state["nodes"][node.id] = expose
-            manifest = registry.resolve(node.tool)
+            manifest = tool_pool[node.tool].manifest
             cache_val: Any = (
                 "bypassed:side_effect" if "side_effecting" in (manifest.tags or []) else False
             )
@@ -125,6 +160,11 @@ async def run_plan_async(
                 "retries": 0,
             }
             timeline[node.id] = {"start_ms": 0, "end_ms": data.get("ms", 0)}
+
+    if impls:
+        for key, func in impls.items():
+            if key in tool_pool:
+                tool_pool[key] = InprocTool(tool_pool[key].manifest, func)
 
     # ------------------------------------------------------------------
     max_parallel = (
@@ -139,8 +179,6 @@ async def run_plan_async(
         plan.execution.cache_default if plan.execution and plan.execution.cache_default is not None else False
     )
     retry_default = plan.execution.retry_default if plan.execution else None
-
-    start = time.perf_counter()
     deadline_at = (
         start + plan.budget.deadline_ms / 1000.0
         if plan.budget and plan.budget.deadline_ms
@@ -165,7 +203,7 @@ async def run_plan_async(
             artifacts.write_node_error(node.id, str(exc))
             raise
 
-        manifest = registry.resolve(node.tool)
+        manifest = tool_pool[node.tool].manifest
         side_effect = "side_effecting" in (manifest.tags or [])
         use_cache = cache_read and (
             (node.cache if node.cache is not None else cache_default) and not side_effect
@@ -194,12 +232,7 @@ async def run_plan_async(
                 state["nodes"][node.id] = expose
                 return
 
-        if manifest.kind == "http":
-            tool: Tool = HttpTool(manifest)
-        else:
-            if not impls or manifest.fqdn not in impls:
-                raise EngineError(f"missing implementation for {manifest.fqdn}")
-            tool = InprocTool(manifest, impls[manifest.fqdn])
+        tool: Tool = tool_pool[manifest.fqdn]
 
         artifacts.write_node_request(node.id, node.tool, inputs)
 
@@ -371,7 +404,8 @@ def run_plan(
     max_parallel: int | None = None,
     cache_read: bool = True,
     cache_write: bool = True,
-
+    loader: ModelLoader | None = None,
+    warmup: bool = True,
 ) -> Tuple[Dict, MicrographiaError | None]:
     """Synchronous wrapper around :func:`run_plan_async`."""
 
@@ -387,6 +421,8 @@ def run_plan(
             max_parallel=max_parallel,
             cache_read=cache_read,
             cache_write=cache_write,
+            loader=loader,
+            warmup=warmup,
         )
     )
 

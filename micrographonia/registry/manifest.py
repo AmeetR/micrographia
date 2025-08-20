@@ -16,6 +16,8 @@ class ToolManifest:
     input_schema: Dict[str, Any]
     output_schema: Dict[str, Any]
     endpoint: Optional[str] = None
+    entrypoint: Optional[str] = None
+    model: Dict[str, Any] | None = None
     tags: list[str] | None = None
 
     @property

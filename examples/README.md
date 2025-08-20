@@ -24,3 +24,17 @@ python -m micrographonia.sdk.cli plan.run \
 ```
 
 Modify the YAML plan or dataset to adapt this flow to your own domain.
+
+### In‑process tool example
+
+The ``manual_plans/notes_inproc.yml`` plan demonstrates using an in‑process
+tool with a pre‑loaded model.  Validate the model availability before running:
+
+```bash
+python -m micrographonia.sdk.cli plan.check-models \
+  --plan examples/manual_plans/notes_inproc.yml \
+  --registry examples/registry/manifests
+```
+
+Running ``plan.run`` on the same plan will implicitly perform the pre‑flight
+check and reuse the cached model on subsequent runs.
