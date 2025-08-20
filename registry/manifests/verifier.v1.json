@@ -2,6 +2,7 @@
   "name": "verifier",
   "version": "v1",
   "kind": "inproc",
+  "entrypoint": "micrographonia.tools.stubs.verifier.factory",
   "input_schema": {
     "type": "object",
     "required": ["entities"],
@@ -36,5 +37,11 @@
       }
     },
     "additionalProperties": false
+  }
+  ,
+  "model": {
+    "base_id": "stub",
+    "adapter_uri": "file://stub",
+    "loader": "peft-lora"
   }
 }
