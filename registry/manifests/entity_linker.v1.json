@@ -2,6 +2,7 @@
   "name": "entity_linker",
   "version": "v1",
   "kind": "inproc",
+  "entrypoint": "micrographonia.tools.stubs.entity_linker.factory",
   "input_schema": {
     "type": "object",
     "required": ["mentions"],
@@ -28,5 +29,11 @@
       }
     },
     "additionalProperties": false
+  }
+  ,
+  "model": {
+    "base_id": "stub",
+    "adapter_uri": "file://stub",
+    "loader": "peft-lora"
   }
 }

@@ -1,0 +1,17 @@
+{
+  "name": "extractor_A",
+  "version": "v2",
+  "kind": "inproc",
+  "entrypoint": "examples.tools.extractor.factory",
+  "input_schema": {"type": "object", "required": ["text"], "properties": {"text": {"type": "string"}}, "additionalProperties": false},
+  "output_schema": {"type": "object", "required": ["triples"], "properties": {"triples": {"type": "array"}}, "additionalProperties": false},
+  "model": {
+    "base_id": "google/gemma-3-270m",
+    "adapter_uri": "hf://AmeetR/extractor-a-v2@9f3a5c1/adapter/",
+    "revision": "9f3a5c1",
+    "loader": "peft-lora",
+    "quant": "4bit",
+    "device_hint": "auto"
+  },
+  "tags": ["kg", "extract"]
+}

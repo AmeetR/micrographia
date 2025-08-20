@@ -10,6 +10,8 @@ import typer
 from .validate import load_plan, validate_plan
 from ..registry.registry import Registry
 from ..runtime.engine import run_plan
+from ..runtime.preflight import preflight_build_tool_pool
+from ..runtime.model_loader import ModelLoader
 from ..runtime.errors import (
     BudgetError,
     EngineError,
@@ -17,6 +19,8 @@ from ..runtime.errors import (
     PlanSchemaError,
     SchemaError,
     ToolCallError,
+    RegistryError,
+    ModelLoadError,
 )
 
 app = typer.Typer()
@@ -32,6 +36,8 @@ EXIT_CODES = {
     BudgetError: 14,
     PlanSchemaError: 15,
     EngineError: 15,
+    RegistryError: 15,
+    ModelLoadError: 15,
 }
 
 
@@ -39,20 +45,6 @@ def _exit_err(exc: MicrographiaError) -> None:
     code = EXIT_CODES.get(type(exc), 1)
     typer.echo(str(exc), err=True)
     raise typer.Exit(code)
-
-
-def _load_impls():
-    try:  # pragma: no cover - optional
-        from ..tools.stubs import extractor_A, entity_linker, verifier, kg_writer
-
-        return {
-            "extractor_A.v1": extractor_A,
-            "entity_linker.v1": entity_linker,
-            "verifier.v1": verifier,
-            "kg_writer.v1": kg_writer,
-        }
-    except Exception:  # pragma: no cover
-        return {}
 
 
 @plan_app.command("validate")
@@ -77,6 +69,7 @@ def plan_run(
     max_parallel: int | None = typer.Option(None, help="Override plan max_parallel"),
     cache_read: bool = typer.Option(True, help="Enable cache reads"),
     cache_write: bool = typer.Option(True, help="Enable cache writes"),
+    no_warmup: bool = typer.Option(False, help="Skip model warmup"),
     emit_summary: bool = typer.Option(False, help="Emit one-line summary"),
 ) -> None:
     try:
@@ -88,13 +81,14 @@ def plan_run(
             p,
             ctx,
             reg,
-            impls=_load_impls(),
             runs_dir=runs,
             run_id=run_id,
             resume=resume,
             max_parallel=max_parallel,
             cache_read=cache_read,
             cache_write=cache_write,
+            loader=ModelLoader(),
+            warmup=not no_warmup,
         )
     except MicrographiaError as exc:
         _exit_err(exc)
@@ -105,6 +99,22 @@ def plan_run(
         typer.echo(json.dumps(record, indent=2))
     if err:
         _exit_err(err)
+
+
+@plan_app.command("check-models")
+def plan_check_models(
+    plan: Path,
+    registry: Path,
+    no_warmup: bool = typer.Option(False, help="Skip model warmup"),
+) -> None:
+    try:
+        reg = Registry(registry)
+        p = load_plan(plan)
+        validate_plan(p, reg)
+        preflight_build_tool_pool(p, reg, loader=ModelLoader(), warmup=not no_warmup)
+    except MicrographiaError as exc:
+        _exit_err(exc)
+    typer.echo("ok")
 
 
 @registry_app.command("health")
