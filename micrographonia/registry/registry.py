@@ -35,6 +35,20 @@ class Registry:
             if manifest.kind == "http":
                 if not manifest.endpoint or not manifest.endpoint.startswith("http"):
                     raise RegistryError(f"http tool {key} missing valid endpoint")
+            elif manifest.kind == "inproc":
+                if not manifest.entrypoint:
+                    raise RegistryError(f"inproc tool {key} missing entrypoint")
+                model = manifest.model or {}
+                if not model.get("base_id"):
+                    raise RegistryError("manifest.model.base_id missing")
+                if not model.get("adapter_uri"):
+                    raise RegistryError("manifest.model.adapter_uri missing")
+                loader = model.get("loader", "peft-lora")
+                if loader not in {"peft-lora"}:
+                    raise RegistryError(f"Unsupported loader: {loader}")
+                uri = model.get("adapter_uri", "")
+                if not any(uri.startswith(p) for p in ("hf://", "s3://", "gs://", "file://")):
+                    raise RegistryError("Unsupported scheme for adapter_uri")
             Draft7Validator.check_schema(manifest.input_schema)
             Draft7Validator.check_schema(manifest.output_schema)
             self._manifests[key] = manifest
@@ -70,6 +84,8 @@ class Registry:
                         "input_schema": m.input_schema,
                         "output_schema": m.output_schema,
                         "endpoint": m.endpoint,
+                        "entrypoint": m.entrypoint,
+                        "model": m.model,
                         "tags": m.tags,
                     },
                     sort_keys=True,

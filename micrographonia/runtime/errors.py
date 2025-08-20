@@ -51,3 +51,7 @@ class BudgetError(MicrographiaError):
 
 class EngineError(MicrographiaError):
     """Raised for unexpected errors within the engine."""
+
+
+class ModelLoadError(MicrographiaError):
+    """Raised when model artifacts cannot be resolved or verified."""

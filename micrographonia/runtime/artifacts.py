@@ -72,6 +72,11 @@ class RunArtifacts:
         self._write(path, {"error": message})
         self.paths["nodes"].setdefault(node_id, {})["error"] = str(path)
 
+    def write_preflight_error(self, message: str, cls: str) -> None:
+        path = self.nodes_dir / "__preflight__.error.json"
+        self._write(path, {"error": message, "class": cls})
+        self.paths["nodes"]["__preflight__"] = {"error": str(path)}
+
     def write_metrics(self, metrics: Dict[str, Any]) -> None:
         path = self.root / "metrics.json"
         self._write(path, metrics)
