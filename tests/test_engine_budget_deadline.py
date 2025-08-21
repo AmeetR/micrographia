@@ -3,8 +3,6 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
-import pytest
-
 from micrographonia.registry.registry import Registry
 from micrographonia.sdk.plan_ir import Plan, Node, Budget
 from micrographonia.runtime.engine import run_plan

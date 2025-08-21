@@ -19,6 +19,10 @@ dependencies = [
     "pyyaml>=6.0",
 ]
 
+[tool.setuptools.packages.find]
+include = ["micrographonia*"]
+exclude = ["registry*"]
+
 [tool.ruff]
 line-length = 88
 target-version = "py311"
