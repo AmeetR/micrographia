@@ -5,9 +5,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-from micrographonia.registry.registry import Registry
-from micrographonia.runtime.errors import PlanSchemaError
-from micrographonia.sdk.validate import load_plan, validate_plan
+from symphonia.registry.registry import Registry
+from symphonia.runtime.errors import PlanSchemaError
+from symphonia.sdk.validate import load_plan, validate_plan
 
 REG_DIR = Path("registry/manifests")
 PLAN_PATH = Path("examples/manual_plans/notes.yml")

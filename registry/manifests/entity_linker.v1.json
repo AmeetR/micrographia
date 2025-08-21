@@ -2,7 +2,7 @@
   "name": "entity_linker",
   "version": "v1",
   "kind": "inproc",
-  "entrypoint": "micrographonia.tools.stubs.entity_linker.factory",
+  "entrypoint": "symphonia.tools.stubs.entity_linker.factory",
   "input_schema": {
     "type": "object",
     "required": ["mentions"],

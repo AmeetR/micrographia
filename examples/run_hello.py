@@ -1,4 +1,4 @@
-"""Hello world example for micrographonia.
+"""Hello world example for symphonia.
 
 This script demonstrates the intended API and writes a placeholder JSON file.
 """

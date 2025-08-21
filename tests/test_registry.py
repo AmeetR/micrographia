@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from micrographonia.registry.registry import Registry
-from micrographonia.runtime.errors import RegistryError
+from symphonia.registry.registry import Registry
+from symphonia.runtime.errors import RegistryError
 
 REG_DIR = Path("registry/manifests")
 

@@ -3,10 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from micrographonia.registry.registry import Registry
-from micrographonia.sdk.validate import load_plan, validate_plan
-from micrographonia.runtime.engine import run_plan
-from micrographonia.tools.stubs import extractor_A, entity_linker, kg_writer, verifier
+from symphonia.registry.registry import Registry
+from symphonia.sdk.validate import load_plan, validate_plan
+from symphonia.runtime.engine import run_plan
+from symphonia.tools.stubs import extractor_A, entity_linker, kg_writer, verifier
 
 REG_DIR = Path("registry/manifests")
 PLAN_PATH = Path("examples/manual_plans/notes.yml")

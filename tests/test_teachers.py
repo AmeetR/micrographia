@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
-from micrographonia.tools.teachers.gemini import run as gemini_run
-from micrographonia.tools.teachers.oai import run as oai_run
+from symphonia.tools.teachers.gemini import run as gemini_run
+from symphonia.tools.teachers.oai import run as oai_run
 
 
 def test_gemini_run(monkeypatch):

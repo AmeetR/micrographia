@@ -2,8 +2,8 @@ import types
 
 import pytest
 
-from micrographonia.runtime.model_loader import ModelLoader
-from micrographonia.runtime.constants import LoaderType, AdapterScheme
+from symphonia.runtime.model_loader import ModelLoader
+from symphonia.runtime.constants import LoaderType, AdapterScheme
 
 
 class DummyModel:
@@ -24,18 +24,18 @@ def test_hf_cache(monkeypatch, tmp_path):
         return str(d)
 
     monkeypatch.setattr(
-        "micrographonia.runtime.model_loader.snapshot_download", fake_snapshot_download
+        "symphonia.runtime.model_loader.snapshot_download", fake_snapshot_download
     )
     monkeypatch.setattr(
-        "micrographonia.runtime.model_loader.AutoTokenizer",
+        "symphonia.runtime.model_loader.AutoTokenizer",
         types.SimpleNamespace(from_pretrained=lambda *_a, **_k: "tok"),
     )
     monkeypatch.setattr(
-        "micrographonia.runtime.model_loader.AutoModelForCausalLM",
+        "symphonia.runtime.model_loader.AutoModelForCausalLM",
         types.SimpleNamespace(from_pretrained=lambda *_a, **_k: DummyModel()),
     )
     monkeypatch.setattr(
-        "micrographonia.runtime.model_loader.PeftModel",
+        "symphonia.runtime.model_loader.PeftModel",
         types.SimpleNamespace(from_pretrained=lambda base, dir: DummyModel()),
     )
 
@@ -68,19 +68,19 @@ def test_quant_fallback(monkeypatch, tmp_path):
         return str(tmp_path)
 
     monkeypatch.setattr(
-        "micrographonia.runtime.model_loader.snapshot_download",
+        "symphonia.runtime.model_loader.snapshot_download",
         fake_snapshot_download,
     )
     monkeypatch.setattr(
-        "micrographonia.runtime.model_loader.AutoTokenizer",
+        "symphonia.runtime.model_loader.AutoTokenizer",
         types.SimpleNamespace(from_pretrained=lambda *_a, **_k: "tok"),
     )
     monkeypatch.setattr(
-        "micrographonia.runtime.model_loader.AutoModelForCausalLM",
+        "symphonia.runtime.model_loader.AutoModelForCausalLM",
         types.SimpleNamespace(from_pretrained=fake_from_pretrained),
     )
     monkeypatch.setattr(
-        "micrographonia.runtime.model_loader.PeftModel",
+        "symphonia.runtime.model_loader.PeftModel",
         types.SimpleNamespace(from_pretrained=lambda base, dir: DummyModel()),
     )
 

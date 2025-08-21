@@ -1,5 +1,5 @@
 import time
-from micrographonia.runtime.cache import cache_key, SimpleCache
+from symphonia.runtime.cache import cache_key, SimpleCache
 
 
 def test_cache_key_stability() -> None:

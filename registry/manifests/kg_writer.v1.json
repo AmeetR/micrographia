@@ -2,7 +2,7 @@
   "name": "kg_writer",
   "version": "v1",
   "kind": "inproc",
-  "entrypoint": "micrographonia.tools.stubs.kg_writer.factory",
+  "entrypoint": "symphonia.tools.stubs.kg_writer.factory",
   "tags": ["side_effecting"],
   "input_schema": {
     "type": "object",

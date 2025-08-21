@@ -3,9 +3,9 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from micrographonia.registry.manifest import ToolManifest
-from micrographonia.runtime.errors import SchemaError, ToolCallError
-from micrographonia.runtime.tools import HttpTool, InprocTool
+from symphonia.registry.manifest import ToolManifest
+from symphonia.runtime.errors import SchemaError, ToolCallError
+from symphonia.runtime.tools import HttpTool, InprocTool
 
 
 def test_inproc_tool_validation() -> None:

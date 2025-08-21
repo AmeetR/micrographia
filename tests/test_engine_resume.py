@@ -3,11 +3,11 @@ from __future__ import annotations
 from pathlib import Path
 import pytest
 
-from micrographonia.registry.registry import Registry
-from micrographonia.sdk.plan_ir import Plan, Node, Execution
-from micrographonia.runtime.engine import run_plan
-from micrographonia.runtime.errors import EngineError, ToolCallError
-from micrographonia.tools.stubs import extractor_A, entity_linker, kg_writer
+from symphonia.registry.registry import Registry
+from symphonia.sdk.plan_ir import Plan, Node, Execution
+from symphonia.runtime.engine import run_plan
+from symphonia.runtime.errors import EngineError, ToolCallError
+from symphonia.tools.stubs import extractor_A, entity_linker, kg_writer
 
 REG_DIR = Path("registry/manifests")
 

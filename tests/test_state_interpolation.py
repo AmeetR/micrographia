@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from micrographonia.runtime.state import State, interpolate
-from micrographonia.runtime.errors import SchemaError
+from symphonia.runtime.state import State, interpolate
+from symphonia.runtime.errors import SchemaError
 
 
 def test_interpolation() -> None:

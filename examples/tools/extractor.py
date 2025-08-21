@@ -8,7 +8,7 @@ output.
 
 from __future__ import annotations
 
-from micrographonia.runtime.tools import Tool
+from symphonia.runtime.tools import Tool
 
 
 class ExtractorTool(Tool):
