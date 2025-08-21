@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """Async execution engine for Micrographia.
 
 This module provides :func:`run_plan` which executes a plan described by the
@@ -10,9 +8,10 @@ runs.  The goal of the implementation is not to be feature complete but to
 provide the behaviour required by the tests in this kata.
 """
 
+from __future__ import annotations
+
 import asyncio
 import hashlib
-import json
 import time
 import datetime as _dt
 from dataclasses import asdict
@@ -27,10 +26,7 @@ from .concurrency import ConcurrencyManager
 from .errors import (
     BudgetError,
     EngineError,
-    ModelLoadError,
     MicrographiaError,
-    PlanSchemaError,
-    RegistryError,
     SchemaError,
     ToolCallError,
 )

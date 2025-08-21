@@ -21,7 +21,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Dict
 
-from .base import TaskPlugin, register
+from .base import register
 
 
 @dataclass

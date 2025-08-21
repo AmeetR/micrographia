@@ -3,8 +3,6 @@ import types
 import sys
 from pathlib import Path
 
-import pytest
-
 from micrographonia.registry.registry import Registry
 from micrographonia.runtime.engine import run_plan
 from micrographonia.runtime.errors import ModelLoadError

@@ -1,7 +1,5 @@
 import json
 from pathlib import Path
-
-import json
 import pytest
 
 from micrographonia.runtime.preflight import preflight_build_tool_pool

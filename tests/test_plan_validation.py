@@ -56,7 +56,6 @@ def test_cycle(tmp_path: Path) -> None:
 
 
 def test_invalid_execution_and_retry(tmp_path: Path) -> None:
-    reg = Registry(REG_DIR)
     data = yaml.safe_load(PLAN_PATH.read_text())
     data["execution"] = {"max_parallel": 0}
     path = _write_plan(tmp_path, data)
