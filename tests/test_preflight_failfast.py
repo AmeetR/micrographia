@@ -2,12 +2,12 @@ import json
 from pathlib import Path
 import pytest
 
-from micrographonia.runtime.preflight import preflight_build_tool_pool
-from micrographonia.runtime.model_loader import ModelLoader
-from micrographonia.registry.registry import Registry
-from micrographonia.runtime.errors import EngineError, RegistryError
-from micrographonia.sdk.plan_ir import Plan, Node
-from micrographonia.runtime.constants import LoaderType, AdapterScheme, STUB_BASE_ID
+from symphonia.runtime.preflight import preflight_build_tool_pool
+from symphonia.runtime.model_loader import ModelLoader
+from symphonia.registry.registry import Registry
+from symphonia.runtime.errors import EngineError, RegistryError
+from symphonia.sdk.plan_ir import Plan, Node
+from symphonia.runtime.constants import LoaderType, AdapterScheme, STUB_BASE_ID
 
 
 def _write_manifest(tmp_path: Path, data: dict) -> None:

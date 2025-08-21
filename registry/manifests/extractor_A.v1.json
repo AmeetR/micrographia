@@ -2,7 +2,7 @@
   "name": "extractor_A",
   "version": "v1",
   "kind": "inproc",
-  "entrypoint": "micrographonia.tools.stubs.extractor_A.factory",
+  "entrypoint": "symphonia.tools.stubs.extractor_A.factory",
   "input_schema": {
     "type": "object",
     "required": ["text"],

@@ -1,4 +1,4 @@
-from micrographonia.runtime.model_loader import ModelLoader
+from symphonia.runtime.model_loader import ModelLoader
 
 
 def test_bundle_hash_ignores_hidden(tmp_path):

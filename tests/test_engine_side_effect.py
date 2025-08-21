@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from micrographonia.registry.registry import Registry
-from micrographonia.sdk.plan_ir import Plan, Node, Execution
-from micrographonia.runtime.engine import run_plan
-from micrographonia.tools.stubs import extractor_A, kg_writer
+from symphonia.registry.registry import Registry
+from symphonia.sdk.plan_ir import Plan, Node, Execution
+from symphonia.runtime.engine import run_plan
+from symphonia.tools.stubs import extractor_A, kg_writer
 
 REG_DIR = Path("registry/manifests")
 

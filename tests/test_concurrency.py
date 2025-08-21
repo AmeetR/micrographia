@@ -1,6 +1,6 @@
 import asyncio
 
-from micrographonia.runtime.concurrency import ConcurrencyManager
+from symphonia.runtime.concurrency import ConcurrencyManager
 
 
 def test_concurrency_semaphores() -> None:

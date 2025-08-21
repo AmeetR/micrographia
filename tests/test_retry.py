@@ -1,5 +1,5 @@
-from micrographonia.runtime.retry import RetryMatcher, backoff_delays
-from micrographonia.runtime.errors import ToolCallError, SchemaError
+from symphonia.runtime.retry import RetryMatcher, backoff_delays
+from symphonia.runtime.errors import ToolCallError, SchemaError
 
 
 def test_retry_matcher() -> None:

@@ -2,8 +2,8 @@ import json
 import os
 from pathlib import Path
 
-from micrographonia.core import run
-from micrographonia.core import constants, exit_codes
+from symphonia.core import run
+from symphonia.core import constants, exit_codes
 
 
 def write_plan(path: Path, nodes):

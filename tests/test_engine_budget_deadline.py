@@ -3,10 +3,10 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
-from micrographonia.registry.registry import Registry
-from micrographonia.sdk.plan_ir import Plan, Node, Budget
-from micrographonia.runtime.engine import run_plan
-from micrographonia.runtime.errors import BudgetError
+from symphonia.registry.registry import Registry
+from symphonia.sdk.plan_ir import Plan, Node, Budget
+from symphonia.runtime.engine import run_plan
+from symphonia.runtime.errors import BudgetError
 
 REG_DIR = Path("registry/manifests")
 

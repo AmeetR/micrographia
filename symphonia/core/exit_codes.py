@@ -1,0 +1,17 @@
+"""Exit code constants for the Symphonia runner."""
+
+SUCCESS = 0
+RUNTIME_FAILURE = 1
+PREFLIGHT_FAILURE = 2
+PLAN_MISMATCH = 3
+INVALID_PLAN = 4
+INTERRUPTED = 130
+
+__all__ = [
+    "SUCCESS",
+    "RUNTIME_FAILURE",
+    "PREFLIGHT_FAILURE",
+    "PLAN_MISMATCH",
+    "INVALID_PLAN",
+    "INTERRUPTED",
+]

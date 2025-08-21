@@ -4,11 +4,11 @@ import sys
 
 import httpx
 
-from micrographonia.registry.registry import Registry
-from micrographonia.runtime.engine import run_plan
-from micrographonia.runtime.model_loader import ModelLoader
-from micrographonia.sdk.plan_ir import Plan, Node
-from micrographonia.runtime.constants import LoaderType, AdapterScheme, STUB_BASE_ID
+from symphonia.registry.registry import Registry
+from symphonia.runtime.engine import run_plan
+from symphonia.runtime.model_loader import ModelLoader
+from symphonia.sdk.plan_ir import Plan, Node
+from symphonia.runtime.constants import LoaderType, AdapterScheme, STUB_BASE_ID
 
 
 class DummyTool:

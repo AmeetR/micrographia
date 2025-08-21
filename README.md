@@ -1,4 +1,4 @@
-# micrographonia
+# symphonia
 
 **Composable small models for structured reasoning.**
 
@@ -6,7 +6,7 @@ A toolkit for orchestrating **tiny specialists** (e.g., Gemma-270M fine-tunes) i
 
 ---
 
-## Why micrographonia?
+## Why symphonia?
 
 Large models are impressive — but they are:
 
@@ -117,10 +117,10 @@ The plan stays the same, only the extractors/linkers differ.
 ## Repository Layout
 
 ```
-micrographonia/
+symphonia/
 ├─ README.md
 ├─ pyproject.toml
-├─ micrographonia/
+├─ symphonia/
 │  ├─ runtime/          # Plan engine (executes DAGs)
 │  ├─ registry/         # Tool manifests (schemas, endpoints)
 │  ├─ tools/            # Stub services (FastAPI, replace with Gemma fine-tunes)
@@ -134,14 +134,14 @@ micrographonia/
 
 ### Finetuning utilities
 
-The ``micrographonia.finetune`` package provides a task-agnostic training
+The ``symphonia.finetune`` package provides a task-agnostic training
 pipeline. At this stage it only exposes a seed-generation command:
 
 ```bash
-python -m micrographonia.finetune.cli datagen-seed --task notes_kg --out seeds.jsonl
+python -m symphonia.finetune.cli datagen-seed --task notes_kg --out seeds.jsonl
 ```
 
-See ``micrographonia/finetune/README.md`` for more details.
+See ``symphonia/finetune/README.md`` for more details.
 
 ---
 
@@ -199,7 +199,7 @@ Spin up FastAPI stubs for extract/link/verify/write. Run a Plan IR YAML.
 Output: JSON KG with provenance.
 
 ```bash
-python -m micrographonia.sdk.cli plan.run \
+python -m symphonia.sdk.cli plan.run \
   --plan examples/manual_plans/notes.yml \
   --context examples/datasets/note.json \
   --registry registry/manifests
@@ -208,7 +208,7 @@ python -m micrographonia.sdk.cli plan.run \
 Validate a plan without running it:
 
 ```bash
-python -m micrographonia.sdk.cli plan.validate \
+python -m symphonia.sdk.cli plan.validate \
   --plan examples/manual_plans/notes.yml \
   --registry registry/manifests
 ```
@@ -256,7 +256,7 @@ Before executing any node, the runtime resolves and loads all referenced tools.
 Use the CLI to dry‑run this resolution:
 
 ```bash
-python -m micrographonia.sdk.cli plan.check-models \
+python -m symphonia.sdk.cli plan.check-models \
   --plan examples/manual_plans/notes_inproc.yml \
   --registry registry/manifests \
   [--no-warmup]
@@ -267,7 +267,7 @@ pre‑flight step that happens automatically when running ``plan.run``.
 
 ### No central store needed
 
-Micrographia remains stateless: manifests embed URIs and the
+Symphonia remains stateless: manifests embed URIs and the
 ``ModelLoader`` uses ``huggingface_hub`` and ``fsspec`` to fetch adapters,
 storing them in a local content‑addressed cache.  Swapping adapters or changing
 revisions requires only updating the manifest.
@@ -296,7 +296,7 @@ revisions requires only updating the manifest.
 
 ## Background & Related Work
 
-micrographonia builds on ideas from several research threads:
+symphonia builds on ideas from several research threads:
 
 - **Small model distillation** – work on compact yet capable models such as TinyLlama, Phi, and Google’s Gemma distillations shows that sub-billion parameter models can retain strong reasoning when specialized for tasks.
 - **Multi-agent orchestration** – systems like AutoGPT, AI Legion, and other planner-executor frameworks inspire our approach of composing many focused agents into a cooperative pipeline.
@@ -312,6 +312,6 @@ MIT.
 
 ---
 
-micrographonia = many small voices in harmony.
+symphonia = many small voices in harmony.
 A system where dozens of tiny Gemma models, each weak alone, combine into structured, reliable reasoning.
 

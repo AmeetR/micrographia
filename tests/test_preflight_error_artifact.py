@@ -3,12 +3,12 @@ import types
 import sys
 from pathlib import Path
 
-from micrographonia.registry.registry import Registry
-from micrographonia.runtime.engine import run_plan
-from micrographonia.runtime.errors import ModelLoadError
-from micrographonia.runtime.model_loader import ModelLoader
-from micrographonia.sdk.plan_ir import Plan, Node
-from micrographonia.runtime.constants import (
+from symphonia.registry.registry import Registry
+from symphonia.runtime.engine import run_plan
+from symphonia.runtime.errors import ModelLoadError
+from symphonia.runtime.model_loader import ModelLoader
+from symphonia.sdk.plan_ir import Plan, Node
+from symphonia.runtime.constants import (
     LoaderType,
     AdapterScheme,
     STOP_REASON_PREFLIGHT,
@@ -61,15 +61,15 @@ def test_preflight_error(tmp_path, monkeypatch):
 
     plan = Plan(version="0.1", graph=[Node(id="a", tool="t.v1", inputs={})])
     monkeypatch.setattr(
-        "micrographonia.runtime.model_loader.AutoTokenizer",
+        "symphonia.runtime.model_loader.AutoTokenizer",
         types.SimpleNamespace(from_pretrained=lambda *_a, **_k: "tok"),
     )
     monkeypatch.setattr(
-        "micrographonia.runtime.model_loader.AutoModelForCausalLM",
+        "symphonia.runtime.model_loader.AutoModelForCausalLM",
         types.SimpleNamespace(from_pretrained=lambda *_a, **_k: object()),
     )
     monkeypatch.setattr(
-        "micrographonia.runtime.model_loader.PeftModel",
+        "symphonia.runtime.model_loader.PeftModel",
         types.SimpleNamespace(from_pretrained=lambda base, dir: object()),
     )
     record, err = run_plan(plan, {}, reg, loader=ModelLoader(), warmup=False)

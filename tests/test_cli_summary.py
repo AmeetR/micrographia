@@ -5,7 +5,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
-from micrographonia.sdk.cli import app, ExitCode
+from symphonia.sdk.cli import app, ExitCode
 
 REG_DIR = Path("registry/manifests").resolve()
 

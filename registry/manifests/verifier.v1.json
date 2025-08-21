@@ -2,7 +2,7 @@
   "name": "verifier",
   "version": "v1",
   "kind": "inproc",
-  "entrypoint": "micrographonia.tools.stubs.verifier.factory",
+  "entrypoint": "symphonia.tools.stubs.verifier.factory",
   "input_schema": {
     "type": "object",
     "required": ["entities"],
