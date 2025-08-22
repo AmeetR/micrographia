@@ -22,6 +22,8 @@ from pathlib import Path
 
 import typer
 
+from .common.identity import stable_id
+from .common.validation import validate_record
 from .data.plugins.base import get_plugin
 
 app = typer.Typer(help="Finetuning utilities")
@@ -48,6 +50,10 @@ def datagen_seed(task: str, out: Path) -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", encoding="utf-8") as f:
         for row in examples:
+            ok, err = validate_record(row, plugin, require_json=plugin.schema() is not None)
+            if not ok:
+                raise typer.BadParameter(f"invalid record: {err}")
+            row["id"] = stable_id(row)
             json.dump(row, f)
             f.write("\n")
 
