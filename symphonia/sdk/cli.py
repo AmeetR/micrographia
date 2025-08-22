@@ -23,12 +23,14 @@ from ..runtime.errors import (
     RegistryError,
     ModelLoadError,
 )
+from symphonia.training.train import main as train_command
 
 app = typer.Typer()
 plan_app = typer.Typer()
 registry_app = typer.Typer()
 app.add_typer(plan_app, name="plan")
 app.add_typer(registry_app, name="registry")
+app.command("train")(train_command)
 
 
 class ExitCode(IntEnum):
