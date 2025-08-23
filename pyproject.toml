@@ -19,11 +19,24 @@ dependencies = [
     "pyyaml>=6.0",
 ]
 
+[project.optional-dependencies]
+finetune = [
+    "transformers>=4.39,<5",
+    "trl>=0.8,<0.12",
+    "peft>=0.10,<0.12",
+    "accelerate>=0.28",
+    "datasets>=2.19",
+    "huggingface_hub>=0.23",
+    "orjson>=3.9",
+    "bitsandbytes>=0.43; platform_system != 'Windows'",
+    "s3fs>=2023.9",
+]
+
 [project.scripts]
 micrographonia = "symphonia.sdk.cli:app"
 
 [tool.setuptools.packages.find]
-include = ["symphonia*"]
+include = ["symphonia*", "micrographonia*"]
 exclude = ["registry*"]
 
 [tool.ruff]

@@ -29,6 +29,45 @@ from .data.plugins.base import get_plugin
 app = typer.Typer(help="Finetuning utilities")
 
 
+def _stub(ctx: typer.Context) -> None:
+    """Emit a friendly message for placeholder commands."""
+    typer.echo(
+        f"{ctx.info_name} is not yet implemented. See docs/quickstart_first_model.md",
+        err=True,
+    )
+    raise typer.Exit(1)
+
+
+@app.command("datagen-assemble", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
+def datagen_assemble(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
+    _stub(ctx)
+
+
+@app.command("datagen-generate", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
+def datagen_generate(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
+    _stub(ctx)
+
+
+@app.command("datagen-filter", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
+def datagen_filter(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
+    _stub(ctx)
+
+
+@app.command("train-sft", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
+def train_sft(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
+    _stub(ctx)
+
+
+@app.command("eval-run", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
+def eval_run(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
+    _stub(ctx)
+
+
+@app.command("package-export", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
+def package_export(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
+    _stub(ctx)
+
+
 @app.command("datagen-seed")
 def datagen_seed(task: str, out: Path) -> None:
     """Generate seed examples for *task* and write to *out* as JSONL.

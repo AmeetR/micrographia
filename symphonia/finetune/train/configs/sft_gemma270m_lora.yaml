@@ -1,0 +1,9 @@
+# Minimal default config for Gemma-270M LoRA fine-tuning.
+# This placeholder can be expanded with training details.
+model:
+  base_model: google/gemma-3-270m
+  adapter: lora
+training:
+  max_steps: 10
+  batch_size: 1
+  learning_rate: 2e-4

@@ -1,0 +1,4 @@
+# Placeholder evaluation config.
+metrics:
+  - type: json_validity
+  - type: exact_match
