@@ -1,4 +1,2 @@
-# Placeholder evaluation config.
-metrics:
-  - type: json_validity
-  - type: exact_match
+task: notes_kg
+max_examples: 200
