@@ -1,0 +1,20 @@
+{
+  "name": "extractor_A.local",
+  "version": "v1",
+  "kind": "inproc",
+  "entrypoint": "examples.tools.extractor.factory",
+  "model": {
+    "base_id": "google/gemma-3-270m",
+    "adapter_uri": "file://runs/finetune/noteskg/package",
+    "loader": "peft-lora",
+    "quant": "4bit",
+    "device_hint": "auto"
+  },
+  "input_schema": {
+    "type": "object",
+    "properties": {"text": {"type": "string"}},
+    "required": ["text"]
+  },
+  "output_schema": {"type": "object"}
+}
+
