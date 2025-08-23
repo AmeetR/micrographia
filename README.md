@@ -272,6 +272,55 @@ Symphonia remains stateless: manifests embed URIs and the
 storing them in a local content‑addressed cache.  Swapping adapters or changing
 revisions requires only updating the manifest.
 
+### Quickstart: Train your first model
+
+The finetune CLI can take you from a tiny seed dataset to a working in‑process
+tool on a single GPU.  Copy and paste the commands below:
+
+```bash
+# 1) Deterministic splits
+python -m micrographonia.finetune.cli datagen-assemble \
+  --in examples/finetune/notes_kg/seeds_small.jsonl \
+  --out runs/finetune/noteskg/seeds.split.parquet
+
+# 2) (Optional) teacher generation
+python -m micrographonia.finetune.cli datagen-generate \
+  --task notes_kg \
+  --seeds runs/finetune/noteskg/seeds.split.parquet \
+  --out runs/finetune/noteskg/raw.jsonl \
+  --json-only --max-examples 2000 --qps 2 --budget-usd 2.50 --strict
+
+# 3) Filter & split to parquet
+python -m micrographonia.finetune.cli datagen-filter \
+  --raw runs/finetune/noteskg/raw.jsonl \
+  --outdir runs/finetune/noteskg \
+  --min-json-valid 0.95 --drop-near-duplicates
+
+# 4) QLoRA fine-tune
+python -m micrographonia.finetune.cli train-sft \
+  --config micrographonia/finetune/train/configs/sft_gemma270m_lora.yaml \
+  --exp noteskg
+
+# 5) Evaluate
+python -m micrographonia.finetune.cli eval-run \
+  --exp noteskg --config micrographonia/finetune/evals/configs/eval_default.yaml
+
+# 6) Package
+python -m micrographonia.finetune.cli package-export \
+  --exp noteskg --dest runs/finetune/noteskg/package
+
+# 7) Wire into a plan
+cp runs/finetune/noteskg/package/manifest.json examples/registry/manifests/extractor_A.local.json
+python -m micrographonia.sdk.cli plan.check-models \
+  --plan examples/manual_plans/notes_inproc.yml \
+  --registry examples/registry/manifests
+python -m micrographonia.sdk.cli plan.run \
+  --plan examples/manual_plans/notes_inproc.yml \
+  --registry examples/registry/manifests --emit-summary
+```
+
+See [docs/quickstart_first_model.md](docs/quickstart_first_model.md) for a one‑page tutorial.
+
 ---
 
 ## Roadmap
