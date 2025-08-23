@@ -283,6 +283,9 @@ docker build -t micrographia:finetune .
 docker run --gpus all -it --env-file .env -v $PWD:/workspace micrographia:finetune
 ```
 
+# install deps
+pip install -e .[finetune]
+
 Then run the workflow inside the container or your host environment:
 
 ```bash
@@ -306,12 +309,12 @@ python -m micrographonia.finetune.cli datagen-filter \
 
 # 4) QLoRA fine-tune
 python -m micrographonia.finetune.cli train-sft \
-  --config micrographonia/finetune/train/configs/sft_gemma270m_lora.yaml \
+  --config symphonia/finetune/train/configs/sft_gemma270m_lora.yaml \
   --exp noteskg
 
 # 5) Evaluate
 python -m micrographonia.finetune.cli eval-run \
-  --exp noteskg --config micrographonia/finetune/evals/configs/eval_default.yaml
+  --exp noteskg --config symphonia/finetune/evals/configs/eval_default.yaml
 
 # 6) Package
 python -m micrographonia.finetune.cli package-export \

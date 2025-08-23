@@ -1,101 +1,47 @@
-"""CLI entry points for finetuning utilities.
-
-This module provides a Typer app exposing subcommands under the
-``symphonia.finetune`` namespace. Currently only a minimal
-``datagen-seed`` command is implemented which generates seed examples
-for a given task plugin and writes them to a JSONL file.
-
-Example
--------
-Run the seed generator for the built-in ``notes_kg`` task and save the
-examples to ``seeds.jsonl``::
-
-    python -m symphonia.finetune.cli datagen-seed \
-        --task notes_kg --out seeds.jsonl
-
-This scaffolding will be extended in future PRs.
-"""
-from __future__ import annotations
-
-import json
-from pathlib import Path
-
 import typer
+from pathlib import Path
+from .datagen.assemble import run as assemble_run
+from .datagen.generate import run as generate_run
+from .datagen.filter import run as filter_run
+from .train.sft import run as train_run
+from .evals.harness import run as eval_run
+from .packaging.export import run as export_run
 
-from .common.identity import stable_id
-from .common.validation import validate_record
-from .data.plugins.base import get_plugin
+app = typer.Typer(help="Micrographia finetune CLI")
 
-app = typer.Typer(help="Finetuning utilities")
+@app.command("datagen-assemble")
+def datagen_assemble(in_path: Path, out: Path, task: str = "notes_kg"):
+    assemble_run(in_path, out, plugin=task)
 
+@app.command("datagen-generate")
+def datagen_generate(
+    task: str,
+    seeds: Path,
+    out: Path,
+    provider: str = "oai",
+    model: str = "gpt-4o-mini",
+    json_only: bool = True,
+    max_examples: int | None = None,
+    qps: float = 2.0,
+    strict: bool = False,
+):
+    generate_run(task, seeds, out, provider, model, json_only, max_examples, qps, strict)
 
-def _stub(ctx: typer.Context) -> None:
-    """Emit a friendly message for placeholder commands."""
-    typer.echo(
-        f"{ctx.info_name} is not yet implemented. See docs/quickstart_first_model.md",
-        err=True,
-    )
-    raise typer.Exit(1)
+@app.command("datagen-filter")
+def datagen_filter(raw: Path, outdir: Path, task: str = "notes_kg", min_json_valid: float = 0.95):
+    filter_run(raw, outdir, task, min_json_valid)
 
+@app.command("train-sft")
+def train_sft(config: Path, exp: str):
+    train_run(config, exp)
 
-@app.command("datagen-assemble", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
-def datagen_assemble(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
-    _stub(ctx)
+@app.command("eval-run")
+def do_eval(exp: str, base_id: str = "google/gemma-3-270m", max_examples: int = 200, task: str = "notes_kg"):
+    eval_run(exp, base_id, max_examples, task=task)
 
+@app.command("package-export")
+def package_export(exp: str, dest: Path):
+    export_run(exp, dest)
 
-@app.command("datagen-generate", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
-def datagen_generate(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
-    _stub(ctx)
-
-
-@app.command("datagen-filter", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
-def datagen_filter(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
-    _stub(ctx)
-
-
-@app.command("train-sft", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
-def train_sft(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
-    _stub(ctx)
-
-
-@app.command("eval-run", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
-def eval_run(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
-    _stub(ctx)
-
-
-@app.command("package-export", context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
-def package_export(ctx: typer.Context) -> None:  # pragma: no cover - placeholder
-    _stub(ctx)
-
-
-@app.command("datagen-seed")
-def datagen_seed(task: str, out: Path) -> None:
-    """Generate seed examples for *task* and write to *out* as JSONL.
-
-    The command loads the task plugin, obtains its seed examples and writes
-    each example as a line of JSON to the provided ``out`` path.
-    It is intentionally lightweight to keep the initial scaffold simple;
-    later iterations will add Parquet output and additional options.
-
-    Example
-    -------
-    ``python -m symphonia.finetune.cli datagen-seed --task notes_kg \``
-    ``--out seeds.jsonl``
-    """
-
-    plugin = get_plugin(task)
-    examples = plugin.seed_examples()
-
-    out.parent.mkdir(parents=True, exist_ok=True)
-    with out.open("w", encoding="utf-8") as f:
-        for row in examples:
-            ok, err = validate_record(row, plugin, require_json=plugin.schema() is not None)
-            if not ok:
-                raise typer.BadParameter(f"invalid record: {err}")
-            row["id"] = stable_id(row)
-            json.dump(row, f)
-            f.write("\n")
-
-
-if __name__ == "__main__":  # pragma: no cover - manual invocation
+if __name__ == "__main__":
     app()

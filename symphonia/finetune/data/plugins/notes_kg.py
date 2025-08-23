@@ -78,3 +78,11 @@ class NotesKGPlugin:
 # Register plugin instance
 plugin = NotesKGPlugin()
 register(plugin)
+
+
+def schema():
+    return plugin.schema()
+
+
+def seed_examples(n: int | None = None):
+    return plugin.seed_examples(n)

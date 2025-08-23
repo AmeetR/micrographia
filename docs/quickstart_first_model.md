@@ -3,6 +3,10 @@
 This guide walks through the minimal end-to-end path for training a tiny specialist with Micrographia.
 It assumes access to a single GPU (e.g. 2080, A10, or T4) and optional teacher APIs (OpenAI or Gemini).
 
+```bash
+pip install -e .[finetune]
+```
+
 ## 1. Assemble deterministic splits
 ```bash
 python -m micrographonia.finetune.cli datagen-assemble \
@@ -30,14 +34,14 @@ python -m micrographonia.finetune.cli datagen-filter \
 ## 4. Train a QLoRA adapter
 ```bash
 python -m micrographonia.finetune.cli train-sft \
-  --config micrographonia/finetune/train/configs/sft_gemma270m_lora.yaml \
+  --config symphonia/finetune/train/configs/sft_gemma270m_lora.yaml \
   --exp noteskg
 ```
 
 ## 5. Evaluate the adapter
 ```bash
 python -m micrographonia.finetune.cli eval-run \
-  --exp noteskg --config micrographonia/finetune/evals/configs/eval_default.yaml
+  --exp noteskg --config symphonia/finetune/evals/configs/eval_default.yaml
 ```
 
 ## 6. Package the adapter and manifest
