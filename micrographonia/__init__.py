@@ -5,7 +5,7 @@ to work while the underlying package is still named ``symphonia``.
 """
 from symphonia import *  # noqa: F401,F403
 import sys as _sys
-import symphonia as _symphonia
+import symphonia as symphonia
 import symphonia.finetune as _finetune
 import symphonia.sdk as _sdk
 import symphonia.registry as _registry
